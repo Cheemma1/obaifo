@@ -6,6 +6,8 @@ const root = path.resolve(__dirname, "..", "..");
 export const env = {
   port: Number(process.env.PORT ?? 4400),
   clientOrigin: process.env.CLIENT_ORIGIN ?? "http://localhost:3400",
+  /** Origin of the admin app (../admin). Allowed to send the session cookie alongside CLIENT_ORIGIN. */
+  adminOrigin: process.env.ADMIN_ORIGIN ?? "http://localhost:3500",
   /** Matches the Postgres in docker-compose.yml. */
   databaseUrl:
     process.env.DATABASE_URL ??

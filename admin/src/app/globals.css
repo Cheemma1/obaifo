@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+/*
+ * The admin stands in the same painted compound as the reader site
+ * (frontend/src/app/globals.css, DESIGN.md), calmed for daily work: a charcoal
+ * rail, nzu ground for the work, deep limewash for the reading-now column.
+ * Ochre still means only "current / under your pointer"; green means "online".
+ */
+@theme {
+  --color-earth: #9c3b1e;
+  --color-earth-deep: #7a2c14;
+  --color-nzu: #efeee9;
+  --color-nzu-deep: #e1dfd7;
+  --color-char: #1a1410;
+  --color-char-soft: #4a403a;
+  --color-ochre: #d39a2c;
+  --color-live: #2b6e39;
+  --color-muted-dark: #bdb4a9;
+  --color-rule: rgb(26 20 16 / 0.16);
+
+  --font-sans: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-tale: var(--font-literata), "Iowan Old Style", Georgia, serif;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-nzu);
+    color: var(--color-char);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scrollbar-color: var(--color-char-soft) var(--color-nzu-deep);
+    caret-color: var(--color-earth);
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-nzu);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  ::selection {
+    background: var(--color-earth);
+    color: var(--color-nzu);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-char);
+    outline-offset: 2px;
+  }
+  .on-char :focus-visible {
+    outline-color: var(--color-nzu);
+  }
+  a {
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: 1px;
+  }
+  dialog::backdrop {
+    background: rgb(26 20 16 / 0.6);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Bricolage narrowed, as the painted lettering on the reader site. */
+  .narrow {
+    font-stretch: 82%;
+    letter-spacing: -0.03em;
+  }
+
+  .live-dot {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 9999px;
+    background: var(--color-live);
+  }
+  .on-char .live-dot {
+    background: #5fbf72;
+  }
+  .live-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: inherit;
+    animation: live-ping 2.4s var(--ease-out) infinite;
+  }
+  @keyframes live-ping {
+    to {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+
+  /* The reading-now thread redraws as a reader moves on through a tale. */
+  .thread-draw {
+    transition:
+      stroke-dashoffset 0.25s var(--ease-out),
+      transform 0.25s var(--ease-out);
+  }
+
+}
+
+/* Unlayered so it wins over the cell padding utilities. */
+/*
+ * Tables stay tables from md up. On phones each row becomes a stacked block
+ * and every cell shows its column name, so nothing scrolls sideways.
+ */
+@media (width < 48rem) {
+  .rtable thead {
+    display: none;
+  }
+  .rtable,
+  .rtable tbody,
+  .rtable tr,
+  .rtable td {
+    display: block;
+    width: 100%;
+  }
+  .rtable tr {
+    padding: 0.75rem 0;
+  }
+  .rtable td {
+    padding: 0.2rem 0;
+    border: 0;
+  }
+  .rtable td[data-label]:not([data-label=""])::before {
+    content: attr(data-label);
+    display: inline-block;
+    min-width: 9.5rem;
+    padding-right: 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-char-soft);
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

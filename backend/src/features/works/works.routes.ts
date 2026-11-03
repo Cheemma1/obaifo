@@ -12,6 +12,11 @@ worksRouter.get("/", async (req, res) => {
   res.json({ items: await works.listPublished(listWorksSchema.parse(req.query)) });
 });
 
+// Before "/:slug", or "today" would be read as a slug.
+worksRouter.get("/today", async (_req, res) => {
+  res.json({ item: await works.taleOfTheDay() });
+});
+
 worksRouter.get("/:slug", async (req, res) => {
   res.json(await works.getDetail(req.params.slug));
 });
@@ -19,7 +24,7 @@ worksRouter.get("/:slug", async (req, res) => {
 worksRouter.get("/:slug/chapters/:index", async (req, res) => {
   const index = Number(req.params.index);
   if (!Number.isInteger(index) || index < 0) throw badRequest("Invalid chapter");
-  res.json(await works.readChapter(req.params.slug, index));
+  res.json(await works.readChapter(req.params.slug, index, req.user));
 });
 
 /** Author studio: /api/studio */

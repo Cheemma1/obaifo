@@ -5,7 +5,7 @@ import type { profileSchema } from "./auth.schema";
 
 export function toPublicUser(user: User): PublicUser {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { emailVerified, image, updatedAt, ...rest } = user;
+  const { emailVerified, image, updatedAt, suspendedAt, suspendReason, ...rest } = user;
   return rest;
 }
 

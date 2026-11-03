@@ -1,30 +1,21 @@
 "use client";
 
 import Link from "@/i18n/link";
-import { useWorks } from "@/features/works/api";
+import { useTaleOfTheDay } from "@/features/works/api";
 import { useI18n } from "@/i18n/provider";
 import { THEME_LABELS } from "@/shared/lib/format";
 import { Arrow, ButtonLink, Skeleton } from "@/shared/ui/primitives";
 import { UliMural } from "@/shared/ui/uli";
 
-/** One featured tale per day, rotating through the featured set. */
-function dayIndex(length: number) {
-  const now = new Date();
-  const start = Date.UTC(now.getUTCFullYear(), 0, 0);
-  const day = Math.floor((Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) - start) / 86_400_000);
-  return length ? day % length : 0;
-}
-
 export function Hero() {
   const { t, locale } = useI18n();
   const h = t.home.hero;
-  const { data: featured, isLoading } = useWorks({ featured: true, sort: "popular", limit: 12 });
-  const today = featured?.length ? featured[dayIndex(featured.length)] : undefined;
+  const { data: today, isLoading } = useTaleOfTheDay();
 
   return (
     <section className="tone-earth plinth relative overflow-hidden">
-      <div className="relative mx-auto grid min-h-[min(calc(100svh-4rem),60rem)] max-w-[90rem] grid-cols-[minmax(0,1fr)] grid-rows-[auto_1fr] px-5 pb-16 md:px-10 lg:block lg:pb-20">
-        <UliMural className="pointer-events-none mx-auto -mb-6 mt-4 w-full max-w-xl lg:absolute lg:right-[-1%] lg:top-[1%] lg:m-0 lg:h-[76%] lg:w-[66%] lg:max-w-none" />
+      <div className="relative mx-auto grid min-h-[min(calc(100svh-4rem),60rem)] max-w-[90rem] grid-cols-[minmax(0,1fr)] grid-rows-[1fr] px-5 pb-12 pt-10 md:pb-16 lg:pt-0 md:px-10 lg:block lg:pb-20">
+        <UliMural className="pointer-events-none hidden lg:absolute lg:block lg:right-[-1%] lg:top-[1%] lg:m-0 lg:h-[76%] lg:w-[66%] lg:max-w-none" />
 
         <div className="relative flex flex-col justify-end gap-10 lg:min-h-[min(calc(100svh-9rem),55rem)] lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">

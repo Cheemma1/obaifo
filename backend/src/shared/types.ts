@@ -22,4 +22,4 @@ export type {
  */
 export const THEMES = Object.values(Theme) as [Theme, ...Theme[]];
 
-export type PublicUser = Omit<User, "emailVerified" | "image" | "updatedAt">;
+export type PublicUser = Omit<User, "emailVerified" | "image" | "updatedAt" | "suspendedAt" | "suspendReason">;

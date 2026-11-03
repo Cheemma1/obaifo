@@ -38,7 +38,7 @@ export const auth = betterAuth({
   // The browser reaches the API through the Next.js proxy, so that is the public origin.
   baseURL: env.clientOrigin,
   basePath: "/api/auth",
-  trustedOrigins: [env.clientOrigin],
+  trustedOrigins: [env.clientOrigin, env.adminOrigin],
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   emailAndPassword: {
     enabled: true,
@@ -71,10 +71,29 @@ export const auth = betterAuth({
         input: true,
       },
       bio: { type: "string", required: false, defaultValue: "", input: false },
+      // Never settable from sign-up: admin is granted with `npm run admin:grant`.
+      isAdmin: { type: "boolean", required: false, defaultValue: false, input: false },
       avatarHue: { type: "number", required: false, input: false },
     },
   },
   databaseHooks: {
+    // Suspended accounts cannot start a session (sign-in answers 403 SUSPENDED).
+    session: {
+      create: {
+        before: async (session) => {
+          const user = await prisma.user.findUnique({
+            where: { id: session.userId },
+            select: { suspendedAt: true },
+          });
+          if (user?.suspendedAt) {
+            throw new APIError("FORBIDDEN", {
+              message: "This account has been suspended",
+              code: "SUSPENDED",
+            });
+          }
+        },
+      },
+    },
     user: {
       create: {
         before: async (user) => {

@@ -24,13 +24,14 @@ The **interface** is available in Igbo and English; **tales are always Igbo** an
 agumagu/
 ├── docker-compose.yml   PostgreSQL 17 for local development (port 5544)
 ├── backend/    Express 5 + TypeScript + Prisma ORM API (port 4400)
-└── frontend/   Next.js 16 + React Query + Tailwind CSS v4 (port 3400)
+├── frontend/   Next.js 16 + React Query + Tailwind CSS v4 (port 3400)
+└── admin/      Separate Next.js admin app: live readers, users, tales, comments, donations (port 3500, see admin/README.md)
 ```
 
 Both apps use a **feature-based** layout:
 
 ```
-backend/src/features/{auth,works,library,engagement,donations,authors}/   routes · service · schema
+backend/src/features/{auth,works,library,engagement,donations,authors,presence,admin}/   routes · service · schema
 backend/src/shared/{db,middleware,utils}/        db/client.ts is the single Prisma client
 backend/prisma/                                  schema.prisma + migrations
 
@@ -54,6 +55,8 @@ cd backend && npm install && npx prisma migrate deploy && npm run dev
 ```bash
 cd frontend && npm install && npm run dev
 ```
+
+For the admin app, run `cd admin && npm install && npm run dev`, then make your account an admin with `npm run admin:grant -- you@example.com` in `backend/`. See `admin/README.md`.
 
 Open http://localhost:3400. The frontend proxies `/api/*` and `/uploads/*` to the API (see `frontend/next.config.ts`), so the session cookie stays first-party.
 

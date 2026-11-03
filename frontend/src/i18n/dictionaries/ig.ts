@@ -474,6 +474,7 @@ const ig: Dictionary = {
     NOT_IGBO:
       "Ọ dị ka e dere ifo a n'asụsụ Bekee. Ọbaifo na-ebipụta naanị ifo a kọrọ n'Igbo.",
     PAYMENT_FAILED: "Ịkwụ ụgwọ ahụ emechaghị.",
+    SUSPENDED: "A kwụsịtụrụ akaụntụ a. Kpọtụrụ Ọbaifo ma ọ bụrụ na i chere na e mehiere.",
   },
 };
 

@@ -1,4 +1,5 @@
 import { createApp } from "./app";
+import { startPresencePruning } from "./features/presence/presence.routes";
 import { env } from "./config/env";
 import { prisma } from "./shared/db/client";
 import { seed } from "./shared/db/seed";
@@ -9,6 +10,7 @@ async function main() {
     await seed();
     console.log("Seeded sample authors and stories");
   }
+  startPresencePruning();
   createApp().listen(env.port, () => {
     console.log(`Ọbaifo API listening on http://localhost:${env.port}`);
   });

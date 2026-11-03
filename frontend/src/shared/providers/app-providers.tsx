@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { ApiError } from "../lib/api-client";
+import { Presence } from "./presence";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -34,6 +35,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
       {/* usePathname suspends on dynamic routes under cacheComponents. */}
       <Suspense fallback={null}>
         <ScrollReset />
+        <Presence />
       </Suspense>
       {children}
     </QueryClientProvider>

@@ -18,7 +18,11 @@ declare global {
 export async function attachUser(req: Request, _res: Response, next: NextFunction) {
   try {
     const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
-    if (session) req.user = (await prisma.user.findUnique({ where: { id: session.user.id } })) ?? undefined;
+    if (session) {
+      const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+      // A suspended account is treated as signed out, even on a session that outlived the suspension.
+      req.user = user && !user.suspendedAt ? user : undefined;
+    }
     next();
   } catch (err) {
     next(err);
@@ -27,6 +31,12 @@ export async function attachUser(req: Request, _res: Response, next: NextFunctio
 
 export function requireAuth(req: Request, _res: Response, next: NextFunction) {
   if (!req.user) return next(unauthorized());
+  next();
+}
+
+export function requireAdmin(req: Request, _res: Response, next: NextFunction) {
+  if (!req.user) return next(unauthorized());
+  if (!req.user.isAdmin) return next(forbidden("Only admins can do this", "ADMIN_REQUIRED"));
   next();
 }
 

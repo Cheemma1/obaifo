@@ -70,6 +70,24 @@ export async function listPublished(query: z.infer<typeof listWorksSchema>): Pro
     .map(toSummary);
 }
 
+/**
+ * The hero's tale of the day. Walks every published tale in the order they
+ * were published, one per day (UTC), and starts again from the first after the last.
+ */
+export async function taleOfTheDay(): Promise<WorkSummary | null> {
+  const where: Prisma.WorkWhereInput = { status: "published" };
+  const count = await prisma.work.count({ where });
+  if (count === 0) return null;
+  const day = Math.floor(Date.now() / 86_400_000);
+  const work = await prisma.work.findFirst({
+    where,
+    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    skip: day % count,
+    include: summaryInclude,
+  });
+  return work && toSummary(work);
+}
+
 async function findPublishedBySlug(slug: string) {
   const work = await prisma.work.findFirst({ where: { slug, status: "published" }, include: summaryInclude });
   if (!work) throw notFound("This tale could not be found");
@@ -90,19 +108,27 @@ export async function getDetail(slug: string) {
 }
 
 /** Every chapter of every tale is free to read, signed in or not. */
-export async function readChapter(slug: string, index: number) {
+export async function readChapter(slug: string, index: number, viewer?: User) {
   let work = await findPublishedBySlug(slug);
   const chapter = await prisma.chapter.findUnique({
     where: { workId_position: { workId: work.id, position: index } },
   });
   if (!chapter) throw notFound("Chapter not found");
 
+  // Every chapter open is logged so the admin can see where readers stop.
+  // Opening the first chapter also counts as one read on the running total.
+  const event = { workId: work.id, chapterIndex: index, userId: viewer?.id ?? null };
   if (index === 0) {
-    work = await prisma.work.update({
-      where: { id: work.id },
-      data: { reads: { increment: 1 } },
-      include: summaryInclude,
-    });
+    [work] = await prisma.$transaction([
+      prisma.work.update({
+        where: { id: work.id },
+        data: { reads: { increment: 1 } },
+        include: summaryInclude,
+      }),
+      prisma.readEvent.create({ data: event }),
+    ]);
+  } else {
+    await prisma.readEvent.create({ data: event });
   }
 
   const total = work.chapters.length;
@@ -181,6 +207,7 @@ export async function create(author: User, input: z.infer<typeof createWorkSchem
         synopsis: input.synopsis,
         coverUrl,
         status: input.publish ? "published" : "draft",
+        publishedAt: input.publish ? new Date() : null,
         chapters: { create: chapterRows(input.chapters) },
       },
     });
@@ -203,6 +230,7 @@ export async function update(id: string, author: User, input: z.infer<typeof upd
   if (input.theme !== undefined) data.theme = input.theme;
   if (input.synopsis !== undefined) data.synopsis = input.synopsis;
   if (input.publish !== undefined) data.status = input.publish ? "published" : "draft";
+  if (input.publish && !work.publishedAt) data.publishedAt = new Date();
 
   const status = input.publish === undefined ? work.status : input.publish ? "published" : "draft";
   if (status === "published") {

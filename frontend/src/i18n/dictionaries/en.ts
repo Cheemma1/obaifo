@@ -510,6 +510,7 @@ const en = {
     NOT_IGBO:
       "This tale looks like it is written in English. Ọbaifo only publishes ifo told in Igbo.",
     PAYMENT_FAILED: "The payment was not completed.",
+    SUSPENDED: "This account has been suspended. Contact Ọbaifo if you think this is a mistake.",
   } as Record<string, string>,
 };
 

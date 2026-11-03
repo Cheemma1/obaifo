@@ -35,6 +35,14 @@ export function useWorks(filters: WorkFilters = {}) {
   });
 }
 
+/** The hero's tale of the day, picked by the server so every reader sees the same one. */
+export function useTaleOfTheDay() {
+  return useQuery({
+    queryKey: ["works", "today"] as const,
+    queryFn: () => api<{ item: WorkSummary | null }>("/works/today").then((r) => r.item),
+  });
+}
+
 export function useWork(slug: string) {
   return useQuery({
     queryKey: worksKeys.detail(slug),

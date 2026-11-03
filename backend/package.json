@@ -14,6 +14,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "seed": "tsx src/shared/db/seed.ts --force",
+    "admin:grant": "tsx src/shared/db/grant-admin.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

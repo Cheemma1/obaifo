@@ -2,7 +2,8 @@
 
 import Link from "@/i18n/link";
 import { useI18n } from "@/i18n/provider";
-import { UliMark, UliSnake } from "../ui/uli";
+import { Logo } from "../ui/logo";
+import { UliSnake } from "../ui/uli";
 
 export function Footer() {
   const { t } = useI18n();
@@ -39,7 +40,7 @@ export function Footer() {
       <div className="mx-auto max-w-[90rem]">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
-            <UliMark className="size-10 text-nzu" />
+            <Logo className="h-12 w-auto text-nzu" />
             <p
               lang="ig"
               className="tale mt-6 text-3xl font-semibold leading-tight md:text-4xl"

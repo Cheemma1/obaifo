@@ -10,7 +10,8 @@ import Link from "@/i18n/link";
 import { useI18n, useLocaleRouter } from "@/i18n/provider";
 import { cn } from "../lib/cn";
 import { Avatar, CloseIcon } from "../ui/primitives";
-import { UliMark, UliSnake } from "../ui/uli";
+import { Logo } from "../ui/logo";
+import { UliSnake } from "../ui/uli";
 
 /** The top band of the wall: always earth, always the same, out of the way while reading down. */
 export function Navbar() {
@@ -75,10 +76,7 @@ export function Navbar() {
             className="flex items-center gap-2.5"
             aria-label={t.nav.home}
           >
-            {/* <UliMark className="size-7" /> */}
-            <span className="text-xl font-extrabold tracking-tight [font-stretch:85%]">
-              Ọbaifo
-            </span>
+            <Logo className="h-8 w-auto" aria-hidden />
           </Link>
 
           <ul className="hidden items-center gap-1 lg:flex">
@@ -95,7 +93,7 @@ export function Navbar() {
             ))}
           </ul>
 
-          <div className="flex items-center gap-4 text-[0.95rem] font-medium">
+          <div className="flex items-center gap-2 text-[0.95rem] font-medium sm:gap-4">
             <LanguageSwitcher />
             {user ? (
               <AccountMenu
@@ -117,7 +115,8 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
-              className="flex min-h-11 items-center gap-2 px-2 lg:hidden"
+              className="flex size-11 items-center justify-center lg:hidden"
+              aria-label={open ? t.nav.close : t.nav.menu}
               aria-expanded={open}
               aria-controls="site-menu"
             >
@@ -132,7 +131,6 @@ export function Navbar() {
                   />
                 </svg>
               )}
-              <span>{open ? t.nav.close : t.nav.menu}</span>
             </button>
           </div>
         </nav>

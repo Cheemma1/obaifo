@@ -73,8 +73,8 @@ export function BrowseView() {
               {isFetching && <span className="size-2.5 shrink-0 animate-pulse bg-earth" aria-hidden />}
             </label>
 
-            <div className="flex items-center gap-4">
-              <div className="flex border-2 border-char" role="group" aria-label={b.all}>
+            <div className="flex flex-wrap items-center gap-3 sm:flex-nowrap sm:gap-4">
+              <div className="flex w-full border-2 border-char sm:w-auto" role="group" aria-label={b.all}>
                 {types.map((ty) => {
                   const active = (type ?? "") === ty.value;
                   return (
@@ -83,19 +83,19 @@ export function BrowseView() {
                       type="button"
                       aria-pressed={active}
                       onClick={() => setParam("type", ty.value || undefined)}
-                      className={cn("min-h-11 px-4 text-sm font-semibold transition-colors", active ? "bg-char text-nzu" : "hover:bg-nzu-deep")}
+                      className={cn("min-h-11 flex-1 px-3 py-1 text-sm font-semibold leading-tight transition-colors sm:flex-none sm:whitespace-nowrap sm:px-4", active ? "bg-char text-nzu" : "hover:bg-nzu-deep")}
                     >
                       {ty.label}
                     </button>
                   );
                 })}
               </div>
-              <label className="flex items-center gap-2 text-sm font-semibold">
-                <span className="sr-only sm:not-sr-only">{b.sort}</span>
+              <label className="flex w-full items-center gap-2 text-sm font-semibold sm:w-auto">
+                <span className="shrink-0">{b.sort}</span>
                 <select
                   value={sort}
                   onChange={(e) => setParam("sort", e.target.value === "new" ? undefined : e.target.value)}
-                  className="min-h-11 cursor-pointer border-2 border-char bg-nzu px-3 font-semibold outline-none"
+                  className="min-h-11 w-full min-w-0 cursor-pointer border-2 border-char bg-nzu px-3 font-semibold outline-none sm:w-auto"
                 >
                   <option value="new">{b.newest}</option>
                   <option value="popular">{b.popular}</option>
