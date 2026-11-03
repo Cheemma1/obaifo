@@ -1,0 +1,207 @@
+// Ọbaifo database. Run `npm run db:migrate` after changing this file.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  reader
+  author
+}
+
+enum WorkType {
+  short
+  long
+}
+
+enum WorkStatus {
+  draft
+  published
+}
+
+/// Every work is an ifo (Igbo folktale); the theme says what kind of tale it is.
+enum Theme {
+  tortoise
+  animals
+  origins
+  spirits
+  heroes
+  wisdom
+  song
+}
+
+enum DonationProvider {
+  mock
+  paystack
+}
+
+enum DonationStatus {
+  pending
+  success
+  failed
+}
+
+/// Accounts, sessions and passwords are managed by Better Auth (src/features/auth/auth.ts).
+model User {
+  id            String     @id @default(uuid())
+  name          String
+  email         String     @unique
+  emailVerified Boolean    @default(false)
+  image         String?
+  role          Role       @default(reader)
+  bio           String     @default("")
+  avatarHue     Int
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now()) @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  works         Work[]
+  progress      Progress[]
+  likes         Like[]
+  comments      Comment[]
+  donations     Donation[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+/// One row per sign-in method. Email + password logins use providerId "credential" and hold the password hash.
+model Account {
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+/// Short-lived tokens (email verification, password reset).
+model Verification {
+  id         String   @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+model Work {
+  id        String     @id @default(uuid())
+  slug      String     @unique
+  /// Always Igbo. Titles are never translated.
+  title     String
+  authorId  String
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  type      WorkType
+  theme     Theme
+  synopsis  String
+  coverUrl  String?
+  status    WorkStatus @default(draft)
+  featured  Boolean    @default(false)
+  reads     Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  chapters  Chapter[]
+  progress  Progress[]
+  likes     Like[]
+  comments  Comment[]
+
+  @@index([status, createdAt])
+  @@index([authorId])
+}
+
+model Chapter {
+  id       String @id @default(uuid())
+  workId   String
+  work     Work   @relation(fields: [workId], references: [id], onDelete: Cascade)
+  /// 0-based reading order within the work.
+  position Int
+  title    String
+  body     String
+  /// Cached so tale lists never need to load chapter bodies.
+  words    Int
+
+  @@unique([workId, position])
+}
+
+model Progress {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workId       String
+  work         Work     @relation(fields: [workId], references: [id], onDelete: Cascade)
+  chapterIndex Int
+  percent      Float
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, workId])
+}
+
+/// Everything on Ọbaifo is free; donations help keep it running.
+model Donation {
+  id         String           @id @default(uuid())
+  /// Null for donors who aren't signed in.
+  userId     String?
+  user       User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name       String
+  email      String
+  reference  String           @unique
+  amountKobo Int
+  provider   DonationProvider
+  status     DonationStatus   @default(pending)
+  createdAt  DateTime         @default(now())
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workId    String
+  work      Work     @relation(fields: [workId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, workId])
+  @@index([workId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workId    String
+  work      Work     @relation(fields: [workId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([workId, createdAt])
+  @@index([userId, createdAt])
+}

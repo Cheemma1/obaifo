@@ -1,0 +1,16 @@
+node_modules
+dist
+.env
+src/generated
+uploads/*
+!uploads/.gitkeep
+.neon
+DESIGN.md
+PRODUCT.md
+
+
+# Design/tooling files (keep local)
+.impeccable/
+DESIGN.md
+PRODUCT.md
+

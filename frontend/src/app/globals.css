@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+/*
+ * Ọbaifo is a painted compound wall: laterite earth and nzu limewash are the
+ * two plasters, charcoal is the ink, ochre marks only what is live right now.
+ */
+@theme {
+  --color-earth: #9c3b1e;
+  --color-earth-deep: #7a2c14;
+  --color-nzu: #efeee9;
+  --color-nzu-deep: #e1dfd7;
+  --color-char: #1a1410;
+  --color-char-soft: #4a403a;
+  --color-ochre: #d39a2c;
+
+  /* Redefined by each wall tone (see .tone-*), so one class works on every ground. */
+  --color-muted: #4a403a;
+  --color-rule: rgb(26 20 16 / 0.18);
+
+  --font-sans: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-tale: var(--font-literata), "Iowan Old Style", Georgia, serif;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  :root {
+    --ring: var(--color-char);
+  }
+
+  html {
+    background: var(--color-nzu);
+    color: var(--color-char);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scrollbar-color: var(--color-char-soft) var(--color-nzu-deep);
+    caret-color: var(--color-earth);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-nzu);
+    font-variant-numeric: lining-nums;
+  }
+
+  ::selection {
+    background: var(--color-earth);
+    color: var(--color-nzu);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  a {
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: 1px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Wall tones: each sets its own ground, ink, muted ink, rule and focus ring. */
+  .tone-earth {
+    background: var(--color-earth);
+    color: var(--color-nzu);
+    --color-muted: #f3d9cb;
+    --color-rule: rgb(239 238 233 / 0.32);
+    --ring: var(--color-nzu);
+  }
+  .tone-earth ::selection {
+    background: var(--color-char);
+  }
+  .tone-nzu {
+    background: var(--color-nzu);
+    color: var(--color-char);
+    --color-muted: #4a403a;
+    --color-rule: rgb(26 20 16 / 0.18);
+    --ring: var(--color-char);
+  }
+  .tone-char {
+    background: var(--color-char);
+    color: var(--color-nzu);
+    --color-muted: #bdb4a9;
+    --color-rule: rgb(239 238 233 / 0.2);
+    --ring: var(--color-nzu);
+  }
+
+  /* The darker band painted along the foot of a compound wall. */
+  .plinth {
+    position: relative;
+  }
+  .plinth::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 14px;
+    background: var(--color-earth-deep);
+    box-shadow: 0 -4px 0 0 var(--color-char);
+  }
+  .tone-char.plinth::after {
+    background: var(--color-earth);
+    box-shadow: 0 -4px 0 0 var(--color-nzu);
+  }
+
+  .display {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-stretch: 82%;
+    letter-spacing: -0.035em;
+    line-height: 0.9;
+  }
+
+  .tale {
+    font-family: var(--font-tale);
+  }
+
+  .prose-tale p + p {
+    margin-top: 1.1em;
+  }
+
+  .link {
+    text-decoration-line: underline;
+    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+    transition: text-decoration-color 0.2s var(--ease-out);
+  }
+  .link:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* Uli strokes draw themselves once. The resting state is fully drawn, so
+     server render, no-JS and reduced motion all show the finished wall. */
+  .uli-draw {
+    stroke-dasharray: 1;
+    animation: uli-draw var(--draw-duration, 2s) cubic-bezier(0.45, 0, 0.25, 1) var(--draw-delay, 0s) backwards;
+  }
+  .uli-dot {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: uli-dot 0.35s var(--ease-out) var(--draw-delay, 0s) backwards;
+  }
+  @keyframes uli-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+  @keyframes uli-dot {
+    from {
+      transform: scale(0);
+    }
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
